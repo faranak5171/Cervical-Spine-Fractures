@@ -78,13 +78,27 @@ df_segments['fold'] = -1
 for fold, (train_idx, valid_idx) in enumerate(kf.split(df_segments)):
     df_segments.loc[valid_idx,'fold'] = fold
 
-
+# Convert model to 3D
 def convert_3d(module):
-    print(type(module))
     module_output = module
-    print(type(module))
     if isinstance(module, torch.nn.BatchNorm2d):
-        print("BatchNorm2d")
+        module_output = torch.nn.BatchNorm3d(
+            module.num_features,
+            module.eps,
+            module.momentum,
+            module.affine,
+            module.track_running_stats
+        )
+        if module.affine:
+            with torch.no_grad():
+                module_output.weight = module.weight
+                module_output.bias = module.bias
+        module_output.running_mean = module.running_mean
+        module_output.running_var = module.running_var
+        module_output.num_batches_tracked = module.num_batches_tracked
+        if hasattr(module, "qconfig"):
+            module_output.qconfig = module.qconfig
+            
     elif isinstance(module, torch.nn.Conv2d):
         print("Conv2d")
     elif isinstance(module, torch.nn.MaxPool2d):
