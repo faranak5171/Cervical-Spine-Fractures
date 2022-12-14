@@ -8,7 +8,8 @@ class SegModel(nn.Module):
         super(SegModel, self).__init__()
         
         # A number of stages used in encoder in range [3, 5]
-        self.encoder_depth = 5
+        self.n_blocks = 4
+        out_dim = 7
         # Building an encoder using Timm
         # create a model for our encoder
         # features_only = True  --> returns the tensors of all layers
@@ -25,15 +26,20 @@ class SegModel(nn.Module):
         # Extract features of encoder
         output = self.encoder(tensor_obj) 
         # get input channels of encoder
-        encoder_channels = [tens.shape[1] for tens in output]
+        encoder_channels = [1] + [tens.shape[1] for tens in output]
         # Lenght of the decoder channel should be the same as **encoder_depth**
         decoder_channels = [256,128,64,32,16]
         if segmentation_type == 'unet':
+            # decoder is used for segmentation mask
             self.decoder = smp.decoders.unet.decoder.UnetDecoder(
-                encoder_channels = encoder_channels,
-                decoder_channels = decoder_channels,
-                n_blocks = self.encoder_depth
+                encoder_channels = encoder_channels[:self.n_blocks+1],
+                decoder_channels = decoder_channels[:self.n_blocks],
+                n_blocks = self.n_blocks
             )
+        self.segmentation_head = nn.Conv2d(decoder_channels[self.n_blocks-1], out_dim, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
 
-model = SegModel('resnet18', 0., 0.)
-print(model.decoder)
+    def forward(self, x):
+        global_features = [0] + self.encoder(x)[:self.n_blocks]
+        seg_features = self.decoder(*global_features)
+        seg_features = self.segmentation_head(seg_features)
+        return seg_features
