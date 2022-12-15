@@ -13,6 +13,7 @@ class SegModel(nn.Module):
         # Building an encoder using Timm
         # create a model for our encoder
         # features_only = True  --> returns the tensors of all layers
+        # The input of a pre-trained network is (w,h,c)
         self.encoder = timm.create_model(
             pre_trained_model,
             pretrained=pretrained,
