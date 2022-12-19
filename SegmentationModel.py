@@ -10,7 +10,7 @@ import segmentation_models_pytorch as smp
 
 
 class SegModel(nn.Module):
-    def __init__(self, pre_trained_model, drop_rate, drop_path_rate, pretrained=False):
+    def __init__(self, pre_trained_model, pretrained=False):
         super(SegModel, self).__init__()
 
         # A number of downsampling operations in encoder in range [3, 5]
@@ -25,8 +25,8 @@ class SegModel(nn.Module):
         self.encoder = timm.create_model(pre_trained_model, pretrained=pretrained, features_only=True,
                                          # model input channels (1 for gray-scale images, 3 for RGB, etc.)
                                          in_chans=3,
-                                         drop_rate=drop_rate,
-                                         drop_path_rate=drop_path_rate)
+                                         drop_rate=0.,
+                                         drop_path_rate=0.)
 
         # Generate a picture with 3 channels and 64*64 resolution
         sample_input = torch.rand(1, 3, 64, 64)
