@@ -57,7 +57,10 @@ class SegModel(nn.Module):
             padding=(1, 1))
 
     def forward(self, x):
-        global_features = [0] + self.encoder(x)[:self.encoder_depth]
-        seg_features = self.decoder(*global_features)
-        seg_features = self.segmentation_head(seg_features)
-        return seg_features
+        '''
+            Sequentially pass X trough model`s encoder, decoder and heads
+        '''
+        features = [0] + self.encoder(x)[:self.encoder_depth]
+        decoder_output = self.decoder(*features)
+        masks = self.segmentation_head(decoder_output)
+        return masks
