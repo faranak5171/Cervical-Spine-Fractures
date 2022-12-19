@@ -114,3 +114,7 @@ drop_rate = 0.
 drop_path_rate = 0.
 model = SegmentationModel.SegModel('resnet18',drop_rate,drop_path_rate)
 model = convert_3d(model)
+
+device =torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(torch.cuda.is_available())
+print(device)
