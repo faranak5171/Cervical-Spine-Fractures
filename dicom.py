@@ -2,7 +2,6 @@ import pydicom
 import cv2
 import glob
 import os
-import numpy as np
 
 def load_dicom(path, image_sizes):
     dicom = pydicom.read_file(path)
