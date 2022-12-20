@@ -7,10 +7,7 @@ class CreateMonaiDataset(Dataset):
         self.df = df.reset_index()
         self.labels = labels
         self.transform = transform
-
-    # This function just returns the length of the labels when called
-    def __len__(self):
-        return self.df.shape[0]
+        self.length = self.df.shape[0]
 
     '''
         This function is used by Pytorch’s Dataset module to get a sample and construct the dataset. When initialised, it will loop through this function creating a sample from each instance in the dataset.
