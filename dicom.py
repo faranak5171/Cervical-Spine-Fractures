@@ -3,19 +3,20 @@ import cv2
 import glob
 import os
 import numpy as np
+import nibabel as nib
 
 
 def load_dicom(path, slice_num):
-    path = os.path.join(path,f"{slice_num}.dcm")
+    path = os.path.join(path, f"{slice_num}.dcm")
     dicom = pydicom.read_file(path)
     data = dicom.pixel_array
-    data = cv2.resize(data, (128,128),interpolation=cv2.INTER_LINEAR)
+    data = cv2.resize(data, (128, 128), interpolation=cv2.INTER_LINEAR)
     return data
 
 
 def load_dicoms_per_UID(UID_path):
     dicom_files = glob.glob(f"{UID_path}/*")
-    slice_nums=[]
+    slice_nums = []
     for path in dicom_files:
         slice_nums.append(path.split("\\")[-1].split('.')[0])
     images = []
@@ -23,17 +24,19 @@ def load_dicoms_per_UID(UID_path):
         images.append(load_dicom(UID_path, slice_num))
     # Convert all images to numpy (num,width,height)
     images = np.array(images)
-    # reverse shape (width, height)
+    # reverse shape (height, width,num)
     images = np.stack(images, -1)
-    #Normalize image
+    # Normalize image
     images = images - np.min(images)
     images = images / (np.max(images) + 1e-4)
-    images = (images * 255).astype(np.uint8)  
+    images = (images * 255).astype(np.uint8)
     return images
 
 
-def load_train_samples_dicom(row):
-    image = load_dicoms_per_UID(row.image_folder)
-    # add depth channel to image shape
-    image = np.expand_dims(image, axis=0).repeat(3,0)
-    return image
+def load_dicom_nibable(row):
+    # image = load_dicoms_per_UID(row.image_folder)
+    # add depth channel to image : shape (batch,height, width,num)
+    # image = np.expand_dims(image, axis=0).repeat(3, 0)
+
+    mask = nib.load(row.mask_path)
+    return mask

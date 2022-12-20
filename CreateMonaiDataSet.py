@@ -16,4 +16,4 @@ class CreateMonaiDataset(Dataset):
 
     def __getitem__(self, index):
         ds_row = self.df.iloc[index]
-        return dicom.load_train_samples_dicom(ds_row)
+        return dicom.load_dicom_nibable(ds_row)
