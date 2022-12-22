@@ -4,6 +4,7 @@ import glob
 import os
 import numpy as np
 import nibabel as nib
+from monai.transforms import Resize
 
 
 def load_dicom(path, slice_num):
@@ -34,9 +35,20 @@ def load_dicoms_per_UID(UID_path):
 
 
 def load_dicom_nibable(row):
-    # image = load_dicoms_per_UID(row.image_folder)
+    image = load_dicoms_per_UID(row.image_folder)
     # add depth channel to image : shape (batch,height, width,num)
-    # image = np.expand_dims(image, axis=0).repeat(3, 0)
+    image = np.expand_dims(image, axis=0).repeat(3, 0)
 
-    mask = nib.load(row.mask_path)
-    return mask
+    # Load mask file with (Hight, width, channel)
+    mask_file = nib.load(row.mask_path).get_fdata()
+    # Pytorch requires images with CHW shape
+    mask_file = mask_file.transpose(2, 0, 1)
+    mask = np.zeros(
+        shape=(7, mask_file.shape[1], mask_file.shape[2], mask_file.shape[0]))
+    for cid in range(7):
+        mask[cid] = (mask_file == (cid+1))
+    mask = mask.astype(np.uint8)*255
+    image_sizes = [128, 128, 128]
+    R = Resize(image_sizes)
+    mask = R(mask).ngitumpy()
+    return image, mask
