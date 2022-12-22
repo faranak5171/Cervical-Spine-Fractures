@@ -12,5 +12,5 @@ This research focuses on creating a deep learning-based model to detect fracture
 <ins>**Data Visualization**</ins>
 
 <p align='center'>
-  <img src='assets/train_csv_visualization.jpg' />
+  <img src='assets/train_csv_visualization.png' />
 </p>
