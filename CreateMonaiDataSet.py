@@ -1,5 +1,6 @@
 from torch.utils.data import Dataset
 import dicom
+import pandas as pd
 
 
 class CreateMonaiDataset(Dataset):
@@ -16,4 +17,9 @@ class CreateMonaiDataset(Dataset):
 
     def __getitem__(self, index):
         ds_row = self.df.iloc[index]
-        return dicom.load_dicom_nibable(ds_row)
+        image, mask = dicom.load_dicom_nibable(ds_row)
+        return image, mask
+
+
+df = pd.read_csv('train.csv')
+ds = CreateMonaiDataset(df, 'train', 'transform')
