@@ -9,3 +9,8 @@ In the elderly, because of superimposed degenerative disease and osteoporosis, d
 
 This research focuses on creating a deep learning-based model to detect fractures in CT scans.
 
+<ins>**Data Visualization**</ins>
+
+<p align='center'>
+  <img src='assets/train_csv_visualization.jpg' />
+</p>
