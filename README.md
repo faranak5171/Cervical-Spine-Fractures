@@ -1,6 +1,7 @@
 **DIAGNOSIS OF CERVICAL SPINE FRACTURES BY CNN**
 
 The most common spine fracture is the cervical spine. The cervical spine consists of 7 vertebrae.
+
 <p align='center'>
   <img src='assets/cervicalspine.jpg' width=300, height=300, class='center' />
 </p>
@@ -13,4 +14,6 @@ This research focuses on creating a deep learning-based model to detect fracture
 
 <p align='center'>
   <img src='assets/train_csv_visualization.png' />
+  </br>
+  <img src='assets/bboxes.png' />
 </p>
