@@ -1,4 +1,6 @@
 import pydicom
+from pydicom.pixel_data_handlers.util import apply_voi_lut
+
 import cv2
 import glob
 import os
@@ -6,9 +8,10 @@ import numpy as np
 import nibabel as nib
 from monai.transforms import Resize
 
-
-def load_meta_info(path):
-    return pydicom.dcmread(path)
+'''
+    Because of the complexity in interpreting the pixel data.
+    Pydicom provides an easy way to get it in a convenient form: Dataset.pixel_array.
+'''
 
 
 def load_dicom(path, slice_num):
@@ -56,3 +59,25 @@ def load_dicom_nibable(row):
     R = Resize(image_sizes)
     mask = R(mask).ngitumpy()
     return image, mask
+
+
+'''
+    By default pydicom reads in pixel data as the raw bytes found in the file.
+'''
+
+
+def load_dicom_meta(path):
+    return pydicom.dcmread(path)
+
+
+'''
+    The DICOM VOI LUT module applies a VOI or windowing operation to input values. 
+    The apply_voi_lut() function can be used with an input array and a dataset containing a VOI LUT module to return values with applied VOI LUT or windowing. 
+    When a dataset contains multiple VOI or windowing views then a particular view can be returned by using the index keyword parameter.
+'''
+
+
+def load_dicom_VOI(path):
+    ds = pydicom.dcmread(path)
+    img = apply_voi_lut(ds.pixel_array, ds)
+    return img
