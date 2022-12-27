@@ -7,6 +7,10 @@ import nibabel as nib
 from monai.transforms import Resize
 
 
+def load_meta_info(path):
+    return pydicom.dcmread(path)
+
+
 def load_dicom(path, slice_num):
     path = os.path.join(path, f"{slice_num}.dcm")
     dicom = pydicom.read_file(path)
