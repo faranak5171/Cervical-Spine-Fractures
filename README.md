@@ -18,4 +18,6 @@ This research focuses on creating a deep learning-based model to detect fracture
   <img src='assets/bboxes.png' />
   </br>
   <img src='assets/bbox_dicom.png'>
+  </br>
+  <img src='assets/segmentation.png'>
 </p>
