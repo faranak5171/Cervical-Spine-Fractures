@@ -8,7 +8,6 @@ class CreateMonaiDataset(Dataset):
         self.df = df.reset_index()
         self.labels = labels
         self.transform = transform
-        self.length = self.df.shape[0]
 
     '''
         This function is used by Pytorch’s Dataset module to get a sample and construct the dataset. When initialised, it will loop through this function creating a sample from each instance in the dataset.
@@ -20,6 +19,5 @@ class CreateMonaiDataset(Dataset):
         image, mask = dicom.load_dicom_nibable(ds_row)
         return image, mask
 
-
-df = pd.read_csv('train.csv')
-ds = CreateMonaiDataset(df, 'train', 'transform')
+    def __len__(self):
+        return self.df.shape[0]
