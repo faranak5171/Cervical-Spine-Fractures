@@ -1,6 +1,8 @@
 import pydicom
 from pydicom.pixel_data_handlers.util import apply_voi_lut
 
+import gdcm
+
 import cv2
 import glob
 import os
@@ -31,7 +33,6 @@ def load_dicoms_per_UID(UID_path):
     for slice_num in slice_nums:
         images.append(load_dicom(UID_path, slice_num))
     # Convert all images to numpy (num,width,height)
-    images = np.array(images)
     # reverse shape (height, width,num)
     images = np.stack(images, -1)
     # Normalize image
@@ -44,20 +45,21 @@ def load_dicoms_per_UID(UID_path):
 def load_dicom_nibable(row):
     image = load_dicoms_per_UID(row.image_folder)
     # add depth channel to image : shape (batch,height, width,num)
-    image = np.expand_dims(image, axis=0).repeat(3, 0)
+    if image.ndim < 4:
+        image = np.expand_dims(image, axis=0).repeat(3, 0)
 
     # Load mask file with (Hight, width, channel)
     mask_file = nib.load(row.mask_path).get_fdata()
+    shape = mask_file.shape
     # Pytorch requires images with CHW shape
-    mask_file = mask_file.transpose(2, 0, 1)
-    mask = np.zeros(
-        shape=(7, mask_file.shape[1], mask_file.shape[2], mask_file.shape[0]))
+    mask_file = mask_file.transpose(1, 0, 2)[::-1, :, ::-1]
+    mask = np.zeros((7, shape[0], shape[1], shape[2]))
     for cid in range(7):
         mask[cid] = (mask_file == (cid+1))
     mask = mask.astype(np.uint8)*255
     image_sizes = [128, 128, 128]
     R = Resize(image_sizes)
-    mask = R(mask).ngitumpy()
+    mask = R(mask).numpy()
     return image, mask
 
 
