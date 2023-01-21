@@ -44,10 +44,11 @@ class SegModel(nn.Module):
         # default parameter for decoder channels is a list of 5 values
         decoder_channels = [256, 128, 64, 32, 16]
 
-        self.decoder = smp.decoders.unet.decoder.UnetDecoder(
-            encoder_channels=encoder_channels[:self.encoder_depth+1],
-            decoder_channels=decoder_channels[:self.encoder_depth],
-            n_blocks=self.encoder_depth)
+        self.decoder = smp.unet.decoder.UnetDecoder(
+                encoder_channels=encoder_channels[:self.encoder_depth+1],
+                decoder_channels=decoder_channels[:self.encoder_depth],
+                n_blocks=self.encoder_depth,
+            )
         # Last block to produce required number of mask channels
         self.segmentation_head = nn.Conv2d(
             in_channels=decoder_channels[self.encoder_depth-1],
